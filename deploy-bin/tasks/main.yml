@@ -1,0 +1,65 @@
+---
+# tasks file for deploy-bin
+    - name: Create directories
+      file:
+        path: /home/testuser/app/bin
+        state: directory
+        owner: testuser
+        group: testuser
+        mode: 0750
+
+    - name: Create directories
+      file:
+        path: /home/testuser/app/conf
+        state: directory
+        owner: testuser
+        group: testuser
+        mode: 0750
+
+    - name: Copy configuration files
+      copy:
+        src: web.conf
+        dest: /home/testuser/app/conf/web.conf
+        owner: testuser
+        group: testuser
+        mode: 0640
+
+    - name: Copy configuration files
+      copy:
+        src: app.conf
+        dest: /home/testuser/app/conf/app.conf
+        owner: testuser
+        group: testuser
+        mode: 0640
+
+    - name: Copy binary files
+      copy:
+        src: singlesocket.bin
+        dest: /home/testuser/app/bin/singlesocket.bin
+        owner: testuser
+        group: testuser
+        mode: 0750
+
+    - name: Copy binary files
+      copy:
+        src: multisocket.bin
+        dest: /home/testuser/app/bin/multisocket.bin
+        owner: testuser
+        group: testuser
+        mode: 0750
+
+    - name: Check CPU count
+      shell: grep -c ^processor /proc/cpuinfo
+      register: cpu_count
+
+    - name: Determine binary file
+      set_fact:
+        binary_file: "{{ 'singlesocket.bin' if cpu_count.stdout|int <= 2 else 'multisocket.bin' }}"
+
+    - name: Copy binary file
+      copy:
+        src: "{{ binary_file }}"
+        dest: /home/testuser/app/bin/
+        owner: testuser
+        group: testuser
+        mode: 0750

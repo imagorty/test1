@@ -1,0 +1,10 @@
+---
+- name: Configure server
+  hosts: sandbox
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  roles:
+    - add-user
+    - deploy-bin
